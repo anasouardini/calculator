@@ -1,0 +1,37 @@
+/*===========================================
+================ CHUNK: BASE/RESET
+===========================================*/
+
+
+@use "../abstracts" as vars;
+
+
+*{
+    box-sizing: border-box;
+}
+
+body{
+    scroll-behavior: smooth;
+    min-height: 100vh;
+}
+
+button, input, select, textarea {
+    width : 190px;
+}
+
+p{
+    max-width: 550px;
+}
+
+a,
+a:active,
+a:hover,
+a:visited{
+    text-decoration: none;
+    color: vars.$main-clr;
+}
+
+.container{
+    width: 80%;
+    margin: 0 auto;
+}

@@ -1,17 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TOP-SignUp</title>
-    <link rel="stylesheet" href="styles/main.css">
-    <script src="scripts/all.js" defer></script>
-</head>
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>TOP-Calculator</title>
+        <link rel="stylesheet" href="styles/main.css">
+        <script src="scripts/all.js" defer></script>
+    </head>
 
-<body>
-    
-</body>
+    <body>
+        <div class="container">
+            <div class="calculator-wrapper">
+                <input class="screen" placeholder="000000000000"></input>
+                <button data-par-left class="delete">(</button>
+                <button data-par-right class="delete">)</button>
+                <button data-clr class="delete">C</button>
+                <button data-del class="delete">&#8592</button>
+                <button data-num="7" class="numpad">7</button>
+                <button data-num="8" class="numpad">8</button>
+                <button data-num="9" class="numpad">9</button>
+                <button data-num="4" class="numpad">4</button>
+                <button data-num="5" class="numpad">5</button>
+                <button data-num="6" class="numpad">6</button>
+                <button data-num="1" class="numpad">1</button>
+                <button data-num="2" class="numpad">2</button>
+                <button data-num="3" class="numpad">3</button>
+                <button data-num="0" class="numpad">0</button>
+                <button data-num="." class="floating-point">.</button>
+                <button data-calc class="calc">=</button>
+                <button data-operator="/" class="operator-div">÷</button>
+                <button data-operator="*" class="operator-mult">×</button>
+                <button data-operator="-" class="operator-sub">-</button>
+                <button data-operator="+" class="operator-add">+</button>
+            </div>
+        </div>
+    </body>
 
 </html>
