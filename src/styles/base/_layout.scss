@@ -3,17 +3,33 @@
 ===========================================*/
 @use "../abstracts/" as vars;
 
+body{
+    background: #F9F9F9;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.error{
+    text-align: center;
+    margin-bottom: 10px;
+    height: 20px;
+}
+
 .calculator-wrapper{
-    margin-top: 100px;
     display: grid;
     grid-template-columns: repeat(4, max-content);
-    gap: 5px;
+    gap: 8px;
     place-items: stretch;
     place-content: center;
     
+    > * {
+        border-radius: 5px;
+    }
+
     .screen{
         margin-bottom: 10px;
-        border-radius: 5px;
         border: 2px solid transparent;
         outline: none;
         line-height: 40px;
@@ -22,7 +38,10 @@
         width: 265px;
         background: vars.$second-clr;
         grid-area: 1/1 / auto/span 4;
-        color: rgba(100, 100, 100, .5);
+        color: rgba(50, 50, 50, .9);
+        &:placeholder-shown{
+            color: rgba(100, 100, 100, .5);
+        }
         
         &:focus{
             box-shadow: inset 0 0 15px 1px rgba(235, 196, 69, .5);
@@ -40,18 +59,17 @@
     .delete{
         font-size: 2rem;
         background-color: vars.$main-clr;
+        transition: filter .2s;
         &:hover{
-            box-shadow: 0 0 10px 0 vars.$main-clr;
-            filter:brightness(.9);
+            filter: brightness(.9);
         }
         &:active{
-            box-shadow: 0 0 10px 0 vars.$main-clr;
-            filter:brightness(.8);
+            filter: brightness(.8);
         }
     }
+
+
 }
-
-
 
 
 

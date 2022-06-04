@@ -363,18 +363,33 @@ a:visited {
 /*===========================================
 ================ CHUNK: BASE/LAYOUT
 ===========================================*/
+body {
+  background: #F9F9F9;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.error {
+  text-align: center;
+  margin-bottom: 10px;
+  height: 20px;
+}
+
 .calculator-wrapper {
-  margin-top: 100px;
   display: grid;
   grid-template-columns: repeat(4, -webkit-max-content);
   grid-template-columns: repeat(4, max-content);
-  gap: 5px;
+  gap: 8px;
   place-items: stretch;
   place-content: center;
 }
+.calculator-wrapper > * {
+  border-radius: 5px;
+}
 .calculator-wrapper .screen {
   margin-bottom: 10px;
-  border-radius: 5px;
   border: 2px solid transparent;
   outline: none;
   line-height: 40px;
@@ -383,6 +398,15 @@ a:visited {
   width: 265px;
   background: rgb(238, 230, 195);
   grid-area: 1/1/auto/span 4;
+  color: rgba(50, 50, 50, 0.9);
+}
+.calculator-wrapper .screen:-moz-placeholder-shown {
+  color: rgba(100, 100, 100, 0.5);
+}
+.calculator-wrapper .screen:-ms-input-placeholder {
+  color: rgba(100, 100, 100, 0.5);
+}
+.calculator-wrapper .screen:placeholder-shown {
   color: rgba(100, 100, 100, 0.5);
 }
 .calculator-wrapper .screen:focus {
@@ -406,17 +430,16 @@ a:visited {
 .calculator-wrapper .delete {
   font-size: 2rem;
   background-color: rgb(235, 196, 69);
+  transition: filter 0.2s;
 }
 .calculator-wrapper button[class^=operator]:hover,
 .calculator-wrapper .calc:hover,
 .calculator-wrapper .delete:hover {
-  box-shadow: 0 0 10px 0 rgb(235, 196, 69);
   filter: brightness(0.9);
 }
 .calculator-wrapper button[class^=operator]:active,
 .calculator-wrapper .calc:active,
 .calculator-wrapper .delete:active {
-  box-shadow: 0 0 10px 0 rgb(235, 196, 69);
   filter: brightness(0.8);
 }
 
