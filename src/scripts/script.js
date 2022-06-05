@@ -1,21 +1,20 @@
 const wrapper = document.querySelector(".calculator-wrapper");
 const screen = document.querySelector(".screen");
 const errorOutput = document.querySelector(".error");
-const opRegxG = /[*+-/]/;
-const opRegxLast = /[*+-/]$/;
-const opRegxFirst = /^[*+-/]/;
-
-// let o = "*aaa-";
-// console.log(o.search(symbolsRegxFirstChar));
+const opRegxG = /[-+*/]/;
+const opRegxLast = /[-+*/]$/;
+const opRegxFirst = /^[-+*/]/;
+const opRegxFirstOnce = /^[-+*/]/;
 
 
 function logError(msg, clr){
     if(errorOutput.innerHTML == ""){
-        errorOutput.innerHTML = msg;
+        if(msg == ""){errorOutput.innerHTML = "";return;}
+        errorOutput.innerHTML = "> " + msg;
     }else{
         if(msg == ""){errorOutput.innerHTML = "";return;}
         errorOutput.appendChild(document.createElement("br"));
-        errorOutput.innerHTML += msg;
+        errorOutput.innerHTML += "> " + msg;
     }
 
     errorOutput.style.cssText = `color: ${clr};`;
@@ -81,15 +80,23 @@ function mapParentheses(expressionCpy){
 }
 
 function parse(){
+    
     let expression = screen.value;
+    
+    //check for ousider symbole
+    let outsiderPosition = expression.search(/[^0-9-*+/().]/);
+    if(outsiderPosition != -1){
+        logError(`outsider symbol (${expression[outsiderPosition]}), reformat your expression`, "red");
+    }
+    
     //remove spaces
     while(expression.includes(" ")){expression.replace(" ", "")}
     
     //remove last/extra operator
     if(expression.search(opRegxLast) != -1){
         if(expression.length == 1){return;}
+        logError(`last operator (${expression[expression.length-1]}) was ignored!`, "red");
         expression = strReplace(expression, -1, 1, "");
-        logError("last operator was remvoed!", "red");
     }
 
     //parse&calc
@@ -98,6 +105,8 @@ function parse(){
         let leftPar = chunk = chunkLength = 0;
 
         if(expression.search(/[()]/) != -1){
+            ////// extract the expression out of parentheses
+
             //check for even parentheses number && map parentheses pairs
             console.log("expression: " + expression);
             let parenthesesMap = mapParentheses(expression);
@@ -105,8 +114,8 @@ function parse(){
             console.log(parenthesesMap);
             
             //get last parentheses (left&right)
-            leftPar = parseInt(Object.keys(parenthesesMap).reverse()[0]);
-            let rightPar = parseInt(parenthesesMap[leftPar]);
+            leftPar = parseFloat(Object.keys(parenthesesMap).reverse()[0]);
+            let rightPar = parseFloat(parenthesesMap[leftPar]);
             chunk = expression.slice(leftPar+1, rightPar);
             chunkLength = chunk.length;//chunk length with parentheses
         }else{
@@ -117,25 +126,42 @@ function parse(){
 
         if(chunk.search(/[()]/) != -1){logError("unexpected Error, check your expression", "red");return;}
         
-        let operator = "+";//the first operator with an empty calcResult=0 (0+op1)
-        //if first char is an operand, sign(+/-)
-        if(chunk.search(opRegxFirst) != -1){chunk = "0" + chunk;}
+        //remove last/extra operator
+        if(chunk.search(opRegxLast) != -1){
+            if(chunk.length == 1){return;}
+            logError(`last operator (${chunk[chunk.length-1]}) was ignored!`, "red");
+            chunk = strReplace(chunk, -1, 1, "");
+        }
+
+        //parse extra opererator
+        let operator = "+";
+        if(chunk.search(opRegxFirst) != -1){
+            if(chunk[0] == "*" || chunk[0] == "/"){
+                logError(`extra (${chunk[0]}) was ignored`, "red");
+                chunk = strReplace(chunk, 0, 1, "");
+            }
+            else{chunk = "0" + chunk;}
+        }
         
+        //calc loop
         let calcResult = 0;
         let position = chunk.search(opRegxG);
-        if(position == -1){logError("no operand in the expression", "red");return;}
+        if(position == -1){logError("no operator in the expression", "red");return;}
         while(position != -1){
-            calcResult = calc(calcResult, parseInt(chunk.slice(0, position)), operator);
+            calcResult = calc(calcResult, parseFloat(chunk.slice(0, position)), operator);
             operator = chunk[position];//set the new operator
             //clean
             chunk = chunk.slice(position+1);
             position = chunk.search(opRegxG);
+            console.log(chunk);
         }
 
-        chunk = String(calc(calcResult, parseInt(chunk), operator));//calc the last operand && update result
-        expression = strReplace(expression, leftPar, chunkLength+2, chunk);//-1 & +1 to replace the parentheses as well
+        chunk = String(calc(calcResult, parseFloat(chunk), operator));//calc the last operand && update result
+        expression = strReplace(expression, leftPar, chunkLength+2, chunk);//+2 to replace the parentheses if they exist, else it has no effect
 
-        if(expression.search(/[()]/) == -1 && expression.search(opRegxG) == -1){break;}
+        //so unprofessional, I have to learn RegEx
+        if(expression.search(/[()]/) == -1 && (expression.search(opRegxG) == -1 || (expression.search(opRegxFirst) != -1 && expression.slice(1).search(opRegxG) == -1)))
+        {break;}
     }
 
     screen.value = expression;
@@ -144,47 +170,43 @@ function parse(){
 function validateOperator(operator){
     const screenValue = screen.value;
     let lastCharIsOp = screenValue.search(opRegxLast) != -1;
+    if(lastCharIsOp){screen.value = strReplace(screen.value, -1, 1, operator);return;}
+    screen.value += operator;
+}
 
-    if(screenValue == ""){
-        if(operator != "+" && operator != "-"){logError("you can only start with a sign or a number", "red");return;}
-        logError("", "red");
-        screen.value += operator;
+function validateParenthese(evetTarget){
+    if (screen.value == "" && evetTarget.getAttribute("right") != null){
+        logError("did you mean to type a closing parenthes?", "red");return;
     }
-    else if(lastCharIsOp){
-        if(screenValue.length == 1){
-            if(operator != "+" && operator != "-"){logError("you can only start with a sign or a number", "red");return;}
-            logError("", "red");
-            screen.value = strReplace(screen.value, -1, 1, operator);
-        }else{
-            screen.value = strReplace(screen.value, -1, 1, operator);
-        }
+
+    if(evetTarget.getAttribute("left") != null){screen.value += "(";}
+    else if(evetTarget.getAttribute("right") != null){screen.value += ")";}
+}
+
+function validateFloatingPoint(){
+    let reversedStr = screen.value.split("").reverse().join("");
+        
+    let position = reversedStr.search(opRegxG);
+    if(position != -1){reversedStr = reversedStr.slice(0, position);}
+
+    if(reversedStr.search(/[.]/) != -1){
+        logError("only single floatig point values are allowed!", "red");return;
     }
-    //TODO: disallow * or / after a "("
-    else{
-        screen.value += operator;
-    }
-    
+
+    screen.value += ".";
 }
 
 function handleClick(e){
     if(e.target == e.currenttarget){return -1}
     
-    logError("", "red");//clear if there's any error msg
-    //TODO: floating point
+    logError("");//clear if there's any old error msg
 
     if(e.target.getAttribute("data-calc") != null){parse();}
     else if(e.target.getAttribute("data-operator") != null){validateOperator(e.target.getAttribute("data-operator"));}
     else if(e.target.getAttribute("data-num") != null){screen.value += e.target.getAttribute("data-num");}
-    else if(e.target.getAttribute("data-par") != null){
-        if (screen.value == "" && e.target.getAttribute("right") != null){
-            logError("did you mean to type a closing parenthes?", "red");return;
-        }logError("", "red");
-
-        if(e.target.getAttribute("left") != null){screen.value += "(";}
-        else if(e.target.getAttribute("right") != null){screen.value += ")";}
-        //TODO: disallow ")" after an operator
-    }
-    else if(e.target.getAttribute("data-del") != null){screen.value = strReplace(screen.value, -1, 1, "");/*-1: last char */}
+    else if(e.target.getAttribute("data-fp") != null){validateFloatingPoint();}
+    else if(e.target.getAttribute("data-par") != null){validateParenthese(e.target);}
+    else if(e.target.getAttribute("data-del") != null){screen.value = screen.value.slice(0, screen.value.length-1);}
     else if(e.target.getAttribute("data-clr") != null){screen.value = "";}
 }
 
