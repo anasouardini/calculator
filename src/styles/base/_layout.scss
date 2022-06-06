@@ -18,7 +18,17 @@ body{
 
 .calculator-wrapper{
     display: grid;
-    grid-template-columns: repeat(4, max-content);
+    // grid-template-columns: repeat(4, max-content);
+    grid: 
+                "screen screen  screen  screen"
+                "prev   history history next  "
+                "parL   parR    clr     del   "
+                "seven  eight   nine    div   "
+                "four   five    six     mul "
+                "one    two     three   sub   "
+                "zero   fp      calc    add   "
+                / max-content max-content max-content max-content
+                ;
     gap: 8px;
     place-items: stretch;
     place-content: center;
@@ -36,7 +46,7 @@ body{
         font-size: 1.5rem;
         width: 265px;
         background: vars.$second-clr;
-        grid-area: 1/1 / auto/span 4;
+        grid-area: screen;
         color: rgba(50, 50, 50, .9);
         &:placeholder-shown{
             color: rgba(100, 100, 100, .5);
@@ -48,11 +58,34 @@ body{
         }
     }
 
-    button.operator-div{grid-area: 3/4 / auto/auto;}
-    button.operator-mult{grid-area: 4/4 / auto/auto;}
-    button.operator-sub{grid-area: 5/4 / auto/auto;}
-    button.operator-add{grid-area: 6/4 / auto/auto;}
+    button.operator-div{grid-area: div;}
+    button.operator-mult{grid-area: mul;}
+    button.operator-sub{grid-area: sub;}
+    button.operator-add{grid-area: add;}
     
+    button[data-fp]{grid-area: fp;}
+    button[data-calc]{grid-area: calc;}
+
+    button[data-num="7"]{grid-area: seven;}
+    button[data-num="8"]{grid-area: eight;}
+    button[data-num="9"]{grid-area: nine;}
+    button[data-num="4"]{grid-area: four;}
+    button[data-num="5"]{grid-area: five;}
+    button[data-num="6"]{grid-area: six;}
+    button[data-num="1"]{grid-area: one;}
+    button[data-num="2"]{grid-area: two;}
+    button[data-num="3"]{grid-area: three;}
+    button[data-num="0"]{grid-area: zero;}
+    button[data-par]{
+        &[left]{grid-area: parL;}
+        &[right]{grid-area: parR;}
+    }
+    .previous{grid-area: prev;font-size: 30px;}
+    .history{grid-area: history;text-align: center;font-weight: bold;letter-spacing: 3px;}
+    .next{grid-area: next;font-size: 30px;}
+    button[data-clr]{grid-area: clr;}
+    button[data-del]{grid-area: del;}
+
     button{
         color: #444;
         transition: filter .2s;
