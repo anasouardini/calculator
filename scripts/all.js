@@ -236,24 +236,3 @@ function handleClick(e){
 }
 
 wrapper.addEventListener("click", handleClick);
-
-function Animal(num){
-    // this.hasLegs = true;
-    this.r = 2;
-}
-Animal.prototype.hasLegs = true;
-
-function Dog(kind){this.kind = kind;}
-//==== COPYING
-// Dog.prototype = new Animal();
-// Dog.prototype = Object.create(Animal.prototype);
-//==== REFERENCING
-Dog.prototype = Animal.prototype;
-
-Dog.prototype.hasLegs = false;
-let dog = new Dog("dog");
-
-animal = new Animal();
-
-console.log(`I'm ${dog.kind} and legs=${dog.hasLegs}`);
-console.log(`I'm animal and legs=${animal.hasLegs}`);
