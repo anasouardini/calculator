@@ -4,7 +4,7 @@ let history = {list:[],current : 0};
 const wrapper = document.querySelector(".calculator-wrapper");
 const screen = document.querySelector(".screen");
 const errorOutput = document.querySelector(".error");
-const opRegxG = /[-+*/]/;
+const opRegx = /[-+*/]/;
 const opRegxLast = /[-+*/]$/;
 const opRegxFirst = /^[-+*/]/;
 
@@ -105,11 +105,11 @@ function parse(){
     while(expression.includes(" ")){expression.replace(" ", "")}
     
     //remove last/extra operator
-    if(expression.search(opRegxLast) != -1){
-        if(expression.length == 1){return;}
-        logError(`last operator (${expression[expression.length-1]}) was ignored!`, "red");
-        expression = strReplace(expression, -1, 1, "");
-    }
+    // while(expression.search(opRegxLast) != -1){
+    //     if(expression.length == 1){return;}
+    //     logError(`last operator (${expression[expression.length-1]}) was ignored!`, "red");
+    //     expression = strReplace(expression, -1, 1, "");
+    // }
 
     //parse&calc
     while(1){
@@ -139,7 +139,7 @@ function parse(){
         if(chunk.search(/[()]/) != -1){logError("unexpected Error, check your expression", "red");return;}
         
         //remove last/extra operator
-        if(chunk.search(opRegxLast) != -1){
+        while(chunk.search(opRegxLast) != -1){
             if(chunk.length == 1){return;}
             logError(`last operator (${chunk[chunk.length-1]}) was ignored!`, "red");
             chunk = strReplace(chunk, -1, 1, "");
@@ -147,17 +147,16 @@ function parse(){
 
         //parse extra opererator
         let operator = "+";
-        if(chunk.search(opRegxFirst) != -1){
-            if(chunk[0] == "*" || chunk[0] == "/"){
+        while(chunk.search(opRegxFirst) != -1){
+            if(chunk[0] == "*" || chunk[0] == "/" || chunk[1].search(opRegx) != -1){
                 logError(`extra (${chunk[0]}) was ignored`, "red");
                 chunk = strReplace(chunk, 0, 1, "");
-            }
-            else{chunk = "0" + chunk;}
+            }else{chunk = "0" + chunk;}
         }
         
         //calc loop
         let calcResult = 0;
-        let position = chunk.search(opRegxG);
+        let position = chunk.search(opRegx);
         if(position == -1){
             if(chunkLength==0){logError("no operator or oprand in the expression", "red");return;}
         }
@@ -168,7 +167,7 @@ function parse(){
             operator = chunk[position];//set the new operator
             //clean
             chunk = chunk.slice(position+1);
-            position = chunk.search(opRegxG);
+            position = chunk.search(opRegx);
         }
 
         //calc the last operand && update result
@@ -178,12 +177,12 @@ function parse(){
         expression = strReplace(expression, leftPar, chunkLength+2, chunk);//+2 to replace the parentheses if they exist, else it has no effect
 
         //so unprofessional, I have to learn RegEx
-        if(expression.search(/[()]/) == -1 && (expression.search(opRegxG) == -1 || (expression.search(opRegxFirst) != -1 && expression.slice(1).search(opRegxG) == -1)))
+        if(expression.search(/[()]/) == -1 && (expression.search(opRegx) == -1 || (expression.search(opRegxFirst) != -1 && expression.slice(1).search(opRegx) == -1)))
         {break;}
     }
     
     let fpPos = expression.search(/[.]/);
-    if(fpPos != -1 && expression.length-fpPos-1 > 4){expression = expression.slice(0, fpPos+5);logError("the result was rounded because the floating point exceeded 4 digits");}
+    if(fpPos != -1 && expression.length-fpPos-1 > 4){expression = expression.slice(0, fpPos+5);}
     screen.value = expression;
 }
 
@@ -206,7 +205,7 @@ function validateParenthese(evetTarget){
 function validateFloatingPoint(){
     let reversedStr = screen.value.split("").reverse().join("");
         
-    let position = reversedStr.search(opRegxG);
+    let position = reversedStr.search(opRegx);
     if(position != -1){reversedStr = reversedStr.slice(0, position);}
 
     if(reversedStr.search(/[.]/) != -1){
@@ -228,10 +227,33 @@ function handleClick(e){
     else if(e.target.getAttribute("data-par"      ) != null){validateParenthese(e.target);}
     else if(e.target.getAttribute("data-del"      ) != null){screen.value = screen.value.slice(0, screen.value.length-1);}
     else if(e.target.getAttribute("data-clr"      ) != null){screen.value = "";}
-    else if(e.target.getAttribute("data-prev"     ) != null){(history.current>0) ? screen.value = history.list[--history.current] : function(){}}
-    else if(e.target.getAttribute("data-next"     ) != null){(history.current<history.list.length-1) ? screen.value = history.list[++history.current] : function(){}}
-
+    else if(e.target.getAttribute("data-prev"     ) != null){
+        (history.current>0) ? screen.value = history.list[--history.current] : screen.value = history.list[history.current]
+    }
+    else if(e.target.getAttribute("data-next"     ) != null){
+        (history.current<history.list.length-1) ? screen.value = history.list[++history.current] : screen.value = history.list[history.current]
+    }
 }
 
 wrapper.addEventListener("click", handleClick);
 
+function Animal(num){
+    // this.hasLegs = true;
+    this.r = 2;
+}
+Animal.prototype.hasLegs = true;
+
+function Dog(kind){this.kind = kind;}
+//==== COPYING
+// Dog.prototype = new Animal();
+// Dog.prototype = Object.create(Animal.prototype);
+//==== REFERENCING
+Dog.prototype = Animal.prototype;
+
+Dog.prototype.hasLegs = false;
+let dog = new Dog("dog");
+
+animal = new Animal();
+
+console.log(`I'm ${dog.kind} and legs=${dog.hasLegs}`);
+console.log(`I'm animal and legs=${animal.hasLegs}`);
