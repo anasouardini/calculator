@@ -228,8 +228,12 @@ function handleClick(e){
     else if(e.target.getAttribute("data-par"      ) != null){validateParenthese(e.target);}
     else if(e.target.getAttribute("data-del"      ) != null){screen.value = screen.value.slice(0, screen.value.length-1);}
     else if(e.target.getAttribute("data-clr"      ) != null){screen.value = "";}
-    else if(e.target.getAttribute("data-prev"     ) != null){(history.current>0) ? screen.value = history.list[--history.current] : function(){}}
-    else if(e.target.getAttribute("data-next"     ) != null){(history.current<history.list.length-1) ? screen.value = history.list[++history.current] : function(){}}
+    else if(e.target.getAttribute("data-prev"     ) != null){
+        (history.current>0) ? screen.value = history.list[--history.current] : screen.value = history.list[history.current]
+    }
+    else if(e.target.getAttribute("data-next"     ) != null){
+        (history.current<history.list.length-1) ? screen.value = history.list[++history.current] : screen.value = history.list[history.current]
+    }
 }
 
 wrapper.addEventListener("click", handleClick);
